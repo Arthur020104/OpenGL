@@ -1,0 +1,37 @@
+# Build directories
+/Debug/
+/Release/
+/x64/
+/x86/
+/build/
+
+# Visual Studio files
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+*.vc.db
+*.ipch
+*.idb
+*.pdb
+*.vs
+
+# Visual Studio Code files
+.vscode/
+.vs/
+# DLLs
+*.dll
+
+# Others
+*.log
+*.cache
+*.obj
+*.exe
+*.tmp
+*.log
+
+# Git itself
+.git/
