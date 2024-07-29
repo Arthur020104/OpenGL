@@ -10,7 +10,7 @@ void triangle();
 void retangle();
 void triangles(unsigned int* VAOt, unsigned int* VBOt, float* vertices);
 void house();
-void CreateCircle(int r, int tri);
+void CreateCircle(float r, int tri, int render);
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 bool wireFrame = false;
@@ -135,7 +135,14 @@ int main()
     };
     //triangles(&VAO1, &VBO1, vertices2);
     //house();
-    CreateCircle(1, 30);
+    /*****************************Circle teste***************************************************************
+    bool diminuindo = false;
+    int desenhar = 3;
+    int circlesSize = 500;
+    CreateCircle(0.5, circlesSize, 3);
+    long long int currentFrame = 0;
+    long long int lastFrame = 0;
+    *****************************Circle teste****************************************************************/
     //triangle();
     unsigned int shaderProgramId = compileShaders();
 
@@ -149,9 +156,34 @@ int main()
 
         glUseProgram(shaderProgramId);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 30*3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, circlesSize*3, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
+        /*****************************Circle teste***************************************************************
+        currentFrame++;
+        if (currentFrame - lastFrame >50)
+        {
+            lastFrame = currentFrame;
+            if (desenhar <= 3)
+            {
+                diminuindo = false;
+            }
+            else if (desenhar >= circlesSize)
+            {
+                diminuindo = true;
+            }
+
+            if (diminuindo)
+            {
+                CreateCircle(0.5, circlesSize, --desenhar);
+            }
+            else
+            {
+                CreateCircle(0.5, circlesSize, ++desenhar);
+            }
+        }
+        *****************************Circle teste****************************************************************/
+        
     }
 
 
@@ -208,7 +240,7 @@ void triangle()
     glEnableVertexAttribArray(0);
 }
 constexpr float PI = 3.14159265358979323846f;
-void CreateCircle(int r, int tri)
+void CreateCircle(float r, int tri, int render)
 {
     if (tri <= 3)
     {
@@ -226,8 +258,10 @@ void CreateCircle(int r, int tri)
     if (!pos || !indices) 
     {
         printf("ERROR MEMORY ALOCATION FAILED FOR CIRCLE.\n");
-        if (pos) free(pos);
-        if (indices) free(indices);
+        if (pos) 
+            free(pos);
+        if (indices) 
+            free(indices);
         return;
     }
 
@@ -236,9 +270,9 @@ void CreateCircle(int r, int tri)
 
     int currentPosIndex = 6;
     int currentIndicesIndex = 0;
-
     int i = 0;
-    while (i < tri)
+    bool stopRender = render != -1 && i >= render;
+    while (i < tri && !stopRender)
     {
         i++;
         x = r * cos(2 * PI * i / tri);
@@ -252,6 +286,7 @@ void CreateCircle(int r, int tri)
             indices[currentIndicesIndex] = 0; currentIndicesIndex++; indices[currentIndicesIndex] = i; currentIndicesIndex++; indices[currentIndicesIndex] = 1; currentIndicesIndex++;
             break;
         }
+        stopRender = render != -1 && i >= render;
     }
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -260,10 +295,10 @@ void CreateCircle(int r, int tri)
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, size*sizeof(float), pos, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size*sizeof(float), pos, GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice*sizeof(int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice*sizeof(int), indices, GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
