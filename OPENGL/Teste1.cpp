@@ -49,9 +49,9 @@ unsigned int compileShaders()
         "in vec3 aPos;\n"
         "void main()\n"
         "{\n"
-        "float red   =tan(-0.25*aPos.x-0.25*aPos.y+0.5);\n"
-        "float green =tan(0.25*aPos.x+0.25*aPos.y+0.5);\n"// 
-        "float blue  = tan(-0.5*aPos.x+0.5*aPos.y+0.5);\n"
+        "float red   =-0.25*aPos.x-0.25*aPos.y+0.5;\n"//-1 e -1 max e 1 1 none     blue 1 e -1 max green
+        "float green =0.25*aPos.x+0.25*aPos.y+0.5;\n"// 
+        "float blue  = -0.5*aPos.x+0.5*aPos.y+0.5;\n"
         "FragColor = vec4(red,green,blue,1.0f);\n"
         "}\n";
     /*********************Shader Compilation*******************************/
