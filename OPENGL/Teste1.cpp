@@ -20,13 +20,13 @@ unsigned int compileShaders()
 {
     /*********************Vertex Shader**************************/
     const char* vertexShaderSource = "#version 330 core\n"
-    "layout(location = 0) in vec3 pos;\n"
-    "out vec3 aPos;"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0f);\n"
-    "    aPos = pos;\n"
-    "}\n";
+        "layout(location = 0) in vec3 pos;\n"
+        "out vec3 aPos;"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0f);\n"
+        "    aPos = pos;\n"
+        "}\n";
     /*********************Shader Compilation*******************************/
     unsigned int vertexShaderId;
     vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
@@ -45,15 +45,15 @@ unsigned int compileShaders()
 
     /*********************Fragment Shader***************************/
     const char* fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "float red   =-0.25*aPos.x-0.25*aPos.y+0.5;\n"//-1 e -1 max e 1 1 none     blue 1 e -1 max green
-    "float green =0.25*aPos.x+0.25*aPos.y+0.5;\n"// 
-    "float blue  = -0.5*aPos.x+0.5*aPos.y+0.5;\n"
-    "FragColor = vec4(red,green,blue,1.0f);\n"
-    "}\n";
+        "out vec4 FragColor;\n"
+        "in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "float red   =tan(-0.25*aPos.x-0.25*aPos.y+0.5);\n"
+        "float green =tan(0.25*aPos.x+0.25*aPos.y+0.5);\n"// 
+        "float blue  = tan(-0.5*aPos.x+0.5*aPos.y+0.5);\n"
+        "FragColor = vec4(red,green,blue,1.0f);\n"
+        "}\n";
     /*********************Shader Compilation*******************************/
     unsigned int fragmentShaderId;
     fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -126,13 +126,13 @@ int main()
     }
     //The first two parameters of glViewport set the location of the lower left corner of the window.
     glViewport(0, 0, WIDTH, HEIGHT);
-   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//WireframeMode
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//WireframeMode
     float vertices1[] = {
         -0.5f, -0.5f, 0.0f,
         0.5f, -0.5f,0.0f,
         0.0f, 0.5f,0.0f,
     };
-   // triangles(&VAO, &VBO, vertices1);
+    // triangles(&VAO, &VBO, vertices1);
     float vertices2[] = {
         0.5f, 0.0f, 0.0f,
         1.0f,0.0f,0.0f,
@@ -163,7 +163,7 @@ int main()
         glUseProgram(shaderProgramId);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-       // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
+        // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
 
@@ -191,7 +191,7 @@ int main()
             }
         }
         *****************************Circle teste****************************************************************/
-        
+
     }
 
 
@@ -218,7 +218,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
     {
         toggletWireFrameMode = true;
-        
+
     }//fazendo com que somente quando o botao é solto o wireFrmae sofre toggle
     if (toggletWireFrameMode && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
     {
@@ -259,16 +259,16 @@ void CreateCircle(float r, int tri, int render)
     float x, y;
 
     int size = (tri * 3) + 6;
-    int sizeIndice = 3 * (tri+1);
-    float* pos =(float*) malloc( size * (sizeof(float)));
-    int* indices = (int*)malloc( sizeIndice* (sizeof(int)));
+    int sizeIndice = 3 * (tri + 1);
+    float* pos = (float*)malloc(size * (sizeof(float)));
+    int* indices = (int*)malloc(sizeIndice * (sizeof(int)));
 
-    if (!pos || !indices) 
+    if (!pos || !indices)
     {
         printf("ERROR MEMORY ALOCATION FAILED FOR CIRCLE.\n");
-        if (pos) 
+        if (pos)
             free(pos);
-        if (indices) 
+        if (indices)
             free(indices);
         return;
     }
@@ -285,7 +285,7 @@ void CreateCircle(float r, int tri, int render)
         i++;
         x = r * cos(2 * PI * i / tri);
         y = r * sin(2 * PI * i / tri);
-        
+
         //definindo vertices
         pos[currentPosIndex] = x; currentPosIndex++; pos[currentPosIndex] = y; currentPosIndex++; pos[currentPosIndex] = 0.0f; currentPosIndex++;
         indices[currentIndicesIndex] = 0; currentIndicesIndex++; indices[currentIndicesIndex] = i - 1; currentIndicesIndex++; indices[currentIndicesIndex] = i; currentIndicesIndex++;
@@ -303,10 +303,10 @@ void CreateCircle(float r, int tri, int render)
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, size*sizeof(float), pos, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), pos, GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice*sizeof(int), indices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndice * sizeof(int), indices, GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
@@ -315,7 +315,7 @@ void CreateCircle(float r, int tri, int render)
     free(indices);
 
 }
-void triangles(unsigned int* VAOt, unsigned int* VBOt, float *vertices)
+void triangles(unsigned int* VAOt, unsigned int* VBOt, float* vertices)
 {
     glGenVertexArrays(1, VAOt);
     glGenBuffers(1, VBOt);
@@ -347,7 +347,7 @@ void house()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -370,7 +370,7 @@ void retangle()
         0, 1, 3,   // first triangle
         1, 2, 3    // second triangle
     };
-    
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
