@@ -21,11 +21,14 @@ unsigned int compileShaders()
     /*********************Vertex Shader**************************/
     const char* vertexShaderSource = "#version 330 core\n"
     "layout(location = 0) in vec3 pos;\n"
+    "layout(location = 1) in vec3 aColor;\n"
     "out vec3 aPos;"
+    "out vec3 Color;\n"
     "void main()\n"
     "{\n"
     "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0f);\n"
     "    aPos = pos;\n"
+    "    Color = aColor;\n"
     "}\n";
     /*********************Shader Compilation*******************************/
     unsigned int vertexShaderId;
@@ -45,15 +48,22 @@ unsigned int compileShaders()
 
     /*********************Fragment Shader***************************/
     const char* fragmentShaderSource = "#version 330 core\n"
+    "in vec3 Color;\n"
     "out vec4 FragColor;\n"
-    "in vec3 aPos;\n"
+    /*"in vec3 aPos;\n"
+    "uniform vec4 ourColor;\n"
+    "uniform float ourTime;\n"*/
     "void main()\n"
     "{\n"
-    "float red   =-0.25*aPos.x-0.25*aPos.y+0.5;\n"//-1 e -1 max e 1 1 none     blue 1 e -1 max green
-    "float green =0.25*aPos.x+0.25*aPos.y+0.5;\n"// 
-    "float blue  = -0.5*aPos.x+0.5*aPos.y+0.5;\n"
-    "FragColor = vec4(red,green,blue,1.0f);\n"
+    /*"float red   =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"     
+    "float green =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"    
+    "float blue  = (sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"
+    "if(sqrt(pow(aPos.x,2)+pow(aPos.y,2)) < ((mod(ourTime, 5))/10) && sqrt(pow(aPos.x,2)+pow(aPos.y,2)) > ((mod(ourTime, 5))/10)-0.05f){blue = sin(ourTime)/2 +0.5f; red = (cos(ourTime)+cos(aPos.y+aPos.x))/4 +0.5f; green = 0;}\n"*/
+    "FragColor = vec4(Color, 1.0);\n"
     "}\n";
+    //0.5*aPos.y+0.5;
+    // //aPos.x - 0.5*aPos.y+0.5;
+    //-1 e -1 max e 1 1 none     blue 1 e -1 max green//-0.5*aPos.y+0.5
     /*********************Shader Compilation*******************************/
     unsigned int fragmentShaderId;
     fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -159,8 +169,23 @@ int main()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        glUseProgram(shaderProgramId);
+        /************Color**********/
+       /* float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue / 2.0f) + 0.5f);
+        int vertexColorLocation = glGetUniformLocation(shaderProgramId, "ourColor");
+        int vertexTimeLocation = glGetUniformLocation(shaderProgramId, "ourTime");
+        */glUseProgram(shaderProgramId);/*
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        glUniform1f(vertexTimeLocation, (GLfloat)timeValue);
+        if (vertexColorLocation == -1) 
+        {
+            fprintf(stderr, "Could not find uniform location for 'ourColor'\n");
+        }
+        if (vertexTimeLocation == -1) 
+        {
+            fprintf(stderr, "Could not find uniform location for 'ourTime'\n");
+        }
+        /************Color**********/
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
        // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
@@ -231,9 +256,10 @@ void processInput(GLFWwindow* window)
 void triangle()
 {
     float vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f,0.0f,
-        0.0f, 1.0f,0.0f
+        // positions         // colors
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
     };
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -243,9 +269,10 @@ void triangle()
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 }
 constexpr float PI = 3.14159265358979323846f;
 void CreateCircle(float r, int tri, int render)

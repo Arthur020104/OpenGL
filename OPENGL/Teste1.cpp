@@ -47,13 +47,19 @@ unsigned int compileShaders()
     const char* fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
         "in vec3 aPos;\n"
+        "uniform vec4 ourColor;\n"
+        "uniform float ourTime;\n"
         "void main()\n"
         "{\n"
-        "float red   =-0.25*aPos.x-0.25*aPos.y+0.5;\n"//-1 e -1 max e 1 1 none     blue 1 e -1 max green
-        "float green =0.25*aPos.x+0.25*aPos.y+0.5;\n"// 
-        "float blue  = -0.5*aPos.x+0.5*aPos.y+0.5;\n"
-        "FragColor = vec4(red,green,blue,1.0f);\n"
+        "float red   =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"
+        "float green =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"
+        "float blue  = (sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"
+        "green = blue = sqrt(pow(aPos.x,2)+pow(aPos.y,2)) < ((mod(ourTime, 10.0))/10) && sqrt(pow(aPos.x,2)+pow(aPos.y,2)) > ((mod(ourTime, 10.0))/10)-0.05f ? 1 : red ;\n"
+        "FragColor = ourColor+vec4(red,green,blue,1.0f);\n"
         "}\n";
+    //0.5*aPos.y+0.5;
+    // //aPos.x - 0.5*aPos.y+0.5;
+    //-1 e -1 max e 1 1 none     blue 1 e -1 max green//-0.5*aPos.y+0.5
     /*********************Shader Compilation*******************************/
     unsigned int fragmentShaderId;
     fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -159,8 +165,21 @@ int main()
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        /************Color**********/
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue / 2.0f) + 0.5f);
+        int vertexColorLocation = glGetUniformLocation(shaderProgramId, "ourColor");
+        int vertexTimeLocation = glGetUniformLocation(shaderProgramId, "ourTime");
         glUseProgram(shaderProgramId);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        glUniform1f(vertexTimeLocation, (GLfloat)timeValue);
+        if (vertexColorLocation == -1) {
+            fprintf(stderr, "Could not find uniform location for 'ourColor'\n");
+        }
+        if (vertexTimeLocation == -1) {
+            fprintf(stderr, "Could not find uniform location for 'ourTime'\n");
+        }
+        /************Color**********/
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
