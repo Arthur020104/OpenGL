@@ -3,7 +3,9 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include "shader.h"
 //Callback function for when window is resized
+//Função de callback para quando a janela é resized(redimensionada)
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void triangle();
@@ -70,7 +72,8 @@ unsigned int compileShaders()
     glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShaderId);
     /*********************Error Checking**************************/
-    //using the same variables for error checking as the vertexShader
+   //using the same variables for error checking as the vertexShader
+    //Usando a mesma variavel do vertexShader para checagem de erro 
     glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &sucess);
     if (!sucess)
     {
@@ -87,6 +90,7 @@ unsigned int compileShaders()
     glLinkProgram(shaderProgramId);
     /*********************Error Checking**************************/
    //using the same variables for error checking as the vertexShader
+    //Usando a mesma variavel do vertexShader para checagem de erro 
     glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &sucess);
     if (!sucess)
     {
@@ -97,6 +101,7 @@ unsigned int compileShaders()
     shaderProgramId;
     /******************Creating Shader Program***********************/
     //delete the shader objects once we've linked them into the program object; we no longer need them anymore
+    //apagando os shader objects após linkar com o objecto do programa; nao vamos precisar mais deles
     glDeleteShader(vertexShaderId);
     glDeleteShader(fragmentShaderId);
     return shaderProgramId;
@@ -124,17 +129,19 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    //telling GLFW we want to call this function on every window resize by registering it
+    //Avisando ao GLFW que queremos que essa funcao seja chamada toda vez que a janela é redimensionada
+   //telling GLFW we want to call this function on every window resize by registering it
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     /*******************Set GLFW********************/
-
+    //O Glad gerencia ponteiros para funcoes do OpenGL, entao precisamos inicializar o GLAD antes the usarmos funcoes do OpenGL
     //Glad manages function pointers for OpenGL so we want to initialize GLAD before we call any OpenGL function
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))/* GLFW gives us glfwGetProcAddress that defines the correct function based on which OS we're compiling for.*/
     {
         printf("Failed to initialize GLAD\n");
         return -1;
     }
-    //The first two parameters of glViewport set the location of the lower left corner of the window.
+    //Os primeiros parametros definem a localizacao do canto esquerdo da janela
+  //The first two parameters of glViewport set the location of the lower left corner of the window.
     glViewport(0, 0, WIDTH, HEIGHT);
    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//WireframeMode
     float vertices1[] = {
@@ -235,7 +242,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 bool toggletWireFrameMode = false;
 void processInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)////if it's not pressed, glfwGetKey returns GLFW_RELEASE
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)// Se nao estiver pressionado, glfwGetKey retorna GLFW_RELEASE//if it's not pressed, glfwGetKey returns GLFW_RELEASE
     {
         glfwSetWindowShouldClose(window, true);
     }
@@ -244,7 +251,7 @@ void processInput(GLFWwindow* window)
     {
         toggletWireFrameMode = true;
         
-    }//fazendo com que somente quando o botao é solto o wireFrmae sofre toggle
+    }//fazendo com que somente quando o botao é solto o wireFrmae sofre toggle// Only when the button is realease the wireframe is toggle
     if (toggletWireFrameMode && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
     {
         toggletWireFrameMode = false;
