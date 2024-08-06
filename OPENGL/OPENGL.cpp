@@ -18,94 +18,6 @@ const unsigned int HEIGHT = 600;
 bool wireFrame = false;
 unsigned int VBO, VAO, EBO, VBO1, VAO1;
 
-unsigned int compileShaders()
-{
-    /*********************Vertex Shader**************************/
-    const char* vertexShaderSource = "#version 330 core\n"
-    "layout(location = 0) in vec3 pos;\n"
-    "layout(location = 1) in vec3 aColor;\n"
-    "out vec3 aPos;"
-    "out vec3 Color;\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0f);\n"
-    "    aPos = pos;\n"
-    "    Color = aColor;\n"
-    "}\n";
-    /*********************Shader Compilation*******************************/
-    unsigned int vertexShaderId;
-    vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShaderId, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShaderId);
-    /*********************Error Checking**************************/
-    int sucess;
-    char infoLog[512];
-    glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &sucess);
-    if (!sucess)
-    {
-        glGetShaderInfoLog(vertexShaderId, 512, NULL, infoLog);
-        printf("ERROR:: VERTEX SHADER COMPILATION FAILED\n %s \n", infoLog);
-    }
-    /*********************Vertex Shader**************************/
-
-    /*********************Fragment Shader***************************/
-    const char* fragmentShaderSource = "#version 330 core\n"
-    "in vec3 Color;\n"
-    "out vec4 FragColor;\n"
-    /*"in vec3 aPos;\n"
-    "uniform vec4 ourColor;\n"
-    "uniform float ourTime;\n"*/
-    "void main()\n"
-    "{\n"
-    /*"float red   =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"     
-    "float green =(sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"    
-    "float blue  = (sin(ourTime)+sin(aPos.y+aPos.x))/4 +0.5f;\n"
-    "if(sqrt(pow(aPos.x,2)+pow(aPos.y,2)) < ((mod(ourTime, 5))/10) && sqrt(pow(aPos.x,2)+pow(aPos.y,2)) > ((mod(ourTime, 5))/10)-0.05f){blue = sin(ourTime)/2 +0.5f; red = (cos(ourTime)+cos(aPos.y+aPos.x))/4 +0.5f; green = 0;}\n"*/
-    "FragColor = vec4(Color, 1.0);\n"
-    "}\n";
-    //0.5*aPos.y+0.5;
-    // //aPos.x - 0.5*aPos.y+0.5;
-    //-1 e -1 max e 1 1 none     blue 1 e -1 max green//-0.5*aPos.y+0.5
-    /*********************Shader Compilation*******************************/
-    unsigned int fragmentShaderId;
-    fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShaderId);
-    /*********************Error Checking**************************/
-   //using the same variables for error checking as the vertexShader
-    //Usando a mesma variavel do vertexShader para checagem de erro 
-    glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &sucess);
-    if (!sucess)
-    {
-        glGetShaderInfoLog(fragmentShaderId, 512, NULL, infoLog);
-        printf("ERROR:: FRAGMENT SHADER COMPILATION FAILED\n %s\n", infoLog);
-    }
-    /*********************Fragment Shader***************************/
-
-    /******************Creating Shader Program***********************/
-    unsigned int shaderProgramId;
-    shaderProgramId = glCreateProgram();
-    glAttachShader(shaderProgramId, vertexShaderId);
-    glAttachShader(shaderProgramId, fragmentShaderId);
-    glLinkProgram(shaderProgramId);
-    /*********************Error Checking**************************/
-   //using the same variables for error checking as the vertexShader
-    //Usando a mesma variavel do vertexShader para checagem de erro 
-    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &sucess);
-    if (!sucess)
-    {
-        glGetProgramInfoLog(shaderProgramId, 512, NULL, infoLog);
-        printf("ERROR:: LINKIN THE PROGRAM FAILED\n %s\n", infoLog);
-
-    }
-    shaderProgramId;
-    /******************Creating Shader Program***********************/
-    //delete the shader objects once we've linked them into the program object; we no longer need them anymore
-    //apagando os shader objects após linkar com o objecto do programa; nao vamos precisar mais deles
-    glDeleteShader(vertexShaderId);
-    glDeleteShader(fragmentShaderId);
-    return shaderProgramId;
-}
 int main()
 {
     /*******************Set GLFW********************/
@@ -144,18 +56,6 @@ int main()
   //The first two parameters of glViewport set the location of the lower left corner of the window.
     glViewport(0, 0, WIDTH, HEIGHT);
    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);//WireframeMode
-    float vertices1[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f,0.0f,
-        0.0f, 0.5f,0.0f,
-    };
-   // triangles(&VAO, &VBO, vertices1);
-    float vertices2[] = {
-        0.5f, 0.0f, 0.0f,
-        1.0f,0.0f,0.0f,
-        0.75, 0.5f,0.0f
-
-    };
     //triangles(&VAO1, &VBO1, vertices2);
     //
     /*****************************Circle teste***************************************************************
@@ -167,7 +67,7 @@ int main()
     long long int lastFrame = 0;
     *****************************Circle teste****************************************************************/
     triangle();
-    unsigned int shaderProgramId = compileShaders();
+    Shader myShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/fragmentShader.glsl");
 
     while (!glfwWindowShouldClose(window))
     {
@@ -177,11 +77,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         /************Color**********/
-       /* float timeValue = glfwGetTime();
+       /* 
         float greenValue = (sin(timeValue / 2.0f) + 0.5f);
         int vertexColorLocation = glGetUniformLocation(shaderProgramId, "ourColor");
         int vertexTimeLocation = glGetUniformLocation(shaderProgramId, "ourTime");
-        */glUseProgram(shaderProgramId);/*
+        */myShaders.use();/*
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glUniform1f(vertexTimeLocation, (GLfloat)timeValue);
         if (vertexColorLocation == -1) 
@@ -193,6 +93,8 @@ int main()
             fprintf(stderr, "Could not find uniform location for 'ourTime'\n");
         }
         /************Color**********/
+        float timeValue = glfwGetTime();
+        myShaders.setFloat("timeValue", timeValue);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
        // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
@@ -229,7 +131,6 @@ int main()
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgramId);
 
     glfwTerminate();
     return 0;
