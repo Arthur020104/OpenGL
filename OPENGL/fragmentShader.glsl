@@ -10,3 +10,14 @@ void main()
     float blue = (sin(timeValue) + position.x + position.y + colorFrag.z)/4.0f + 0.5f;
     gl_FragColor = vec4(red, green, blue, 1.0f);
 }
+
+/*
+-Exercicio de cor baseado no posicao
+in vec3 position;
+
+void main()
+{
+  
+    gl_FragColor = vec4(position.x, position.y, position.z, 1.0f);
+}
+*/

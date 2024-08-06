@@ -95,6 +95,10 @@ int main()
         /************Color**********/
         float timeValue = glfwGetTime();
         myShaders.setFloat("timeValue", timeValue);
+        /*
+        * Exercicio de offset
+        * myShaders.setFloat("horizontalOffset", 0.3f);
+        */ 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
        // glDrawElements(GL_TRIANGLES, 2*3, GL_UNSIGNED_INT, 0);
