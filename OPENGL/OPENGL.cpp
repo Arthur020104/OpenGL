@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include "shader.h"
+#include "shader.hpp"
 //Callback function for when window is resized
 //Função de callback para quando a janela é resized(redimensionada)
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -67,7 +67,7 @@ int main()
     long long int lastFrame = 0;
     *****************************Circle teste****************************************************************/
     triangle();
-    Shader myShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/fragmentShader.glsl");
+    Shader myShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShader.glsl");
 
     while (!glfwWindowShouldClose(window))
     {
@@ -95,6 +95,7 @@ int main()
         /************Color**********/
         float timeValue = glfwGetTime();
         myShaders.setFloat("timeValue", timeValue);
+       // myShaders.setFloat("circleTickness", 0.005f); teste shader
         /*
         * Exercicio de offset
         * myShaders.setFloat("horizontalOffset", 0.3f);
