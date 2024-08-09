@@ -4,7 +4,7 @@
 /x64/
 /x86/
 /build/
-
+/Libs/
 # Visual Studio files
 *.vcxproj
 *.vcxproj.filters
