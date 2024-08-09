@@ -1,15 +1,30 @@
-//FRAGMENT SHADER
 #version 330 core
-uniform float timeValue;
-in vec3 position;
-in vec3 colorFrag;
+out vec4 FragColor;
+  
+in vec3 ourColor;
+in vec2 TexCoord;
+
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+
 void main()
 {
-    float red = (cos(timeValue) + position.x + position.y + colorFrag.x)/4.0f + 0.5f; 
-    float green = (sin(timeValue) + position.x + position.y + colorFrag.y)/4.0f + 0.5f;
-    float blue = (sin(timeValue) + position.x + position.y + colorFrag.z)/4.0f + 0.5f;
-    gl_FragColor = vec4(red, green, blue, 1.0f);
+    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
 }
+
+/*//FRAGMENT SHADER
+#version 330 core
+//uniform float timeValue;
+in vec3 position;
+in vec3 colorFrag;
+in vec2 texture;
+void main()
+{
+   // float red = (cos(timeValue) + position.x + position.y + colorFrag.x)/4.0f + 0.5f; 
+    //float green = (sin(timeValue) + position.x + position.y + colorFrag.y)/4.0f + 0.5f;
+    //float blue = (sin(timeValue) + position.x + position.y + colorFrag.z)/4.0f + 0.5f;
+    gl_FragColor = vec4(texture, 1.0f);
+}*/
 
 
 /*TESTE SHADER
