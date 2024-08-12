@@ -6,10 +6,22 @@ in vec2 TexCoord;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
-
+uniform float  timeValue;
+uniform float mixValue;
+in vec3 position;
 void main()
 {
-    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
+//F(x) = 1 -x
+    //vec2 textCoordInv = vec2( 1-TexCoord.x, TexCoord.y*-1); //
+    float aux = pow(position.x, 2) + pow(position.y, 2);
+    float radius = 0.3f * mod(timeValue, 3);
+    if(aux <= pow(radius, 2))
+    {
+        FragColor = mix(texture(texture1, TexCoord), texture(texture2,TexCoord), mixValue);
+        
+        return;
+    }
+    FragColor = texture(texture1, TexCoord) ;
 }
 
 /*//FRAGMENT SHADER
