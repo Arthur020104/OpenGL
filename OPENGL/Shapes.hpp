@@ -1,3 +1,4 @@
+#pragma once
 #include <glad/glad.h>
 #include <iostream>
 #include "Libs/stb_image.h"

@@ -1,6 +1,3 @@
-#include <glad/glad.h>
-#include <cmath>
-#include <vector>
 #include "shader.hpp"
 #include "Input.hpp"
 #include "Shapes.hpp"
