@@ -1,4 +1,7 @@
-#include "Shapes.hpp"
+#include "Shapes.h"
+#include <glad/glad.h>
+#include <iostream>
+#include "Libs/stb_image.h"
 void retangle(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, unsigned int& texture1, unsigned int& texture2)
 {
 

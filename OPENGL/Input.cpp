@@ -1,4 +1,4 @@
-#include "Input.hpp"
+#include "Input.h"
 bool toggletWireFrameMode = false;
 bool wireFrame = false;
 

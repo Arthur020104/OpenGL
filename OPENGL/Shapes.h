@@ -1,7 +1,4 @@
 #pragma once
-#include <glad/glad.h>
-#include <iostream>
-#include "Libs/stb_image.h"
 const float PI = 3.14159265358979323846f;
 void retangle(unsigned int& VAO, unsigned int& VBO, unsigned int& EBO, unsigned int& texture1, unsigned int& texture2);
 void CreateCircle(float r, int tri, int render, unsigned int& VAO, unsigned int& VBO, unsigned int& EBO);
