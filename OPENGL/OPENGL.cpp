@@ -1,6 +1,13 @@
-#include "shader.hpp"
-#include "Input.hpp"
-#include "Shapes.hpp"
+#include "shader.h"
+#include "Input.h"
+#include "Shapes.h"
+#include <glad/glad.h>
+#include <iostream>
+#include <glm/glm/glm.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
+#include <glm/glm/gtc/type_ptr.hpp>
+
+
 //Callback function for when window is resized
 //Funcao de callback para quando a janela eh resized(redimensionada)
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -9,9 +16,57 @@ const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 unsigned int VBO, VAO, EBO, VBO1, VAO1, EBO1;
 unsigned int texture1, texture2;
-int main()
+void printMatrix(const glm::mat4& matrix) {
+    for (int i = 0; i < 4; ++i) 
+    {
+        for (int j = 0; j < 4; ++j) 
+        {
+            std::cout << matrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+glm::mat4 myRotate(const float &theta, const glm::vec3 &a)
 {
-    /*******************Set GLFW********************/
+    glm::mat4 I4 = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); I4 = glm::transpose(I4);
+    glm::mat4 mat = glm::mat4(a.x * a.x, a.x * a.y, a.x * a.z, 0.0f, a.y * a.x, a.y * a.y, a.y * a.z, 0.0f, a.z * a.x, a.z * a.y, a.z * a.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); mat = glm::transpose(mat);
+    glm::mat4 mat2 = glm::mat4(0.0f, -a.z, a.y, 0.0f, a.z, 0.0f, -a.x, 0.0f, -a.y, a.x, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); mat2 = glm::transpose(mat2);
+    glm::mat4 rot = glm::cos(theta) * I4 +(1-glm::cos(theta)) * mat + glm::sin(theta) * mat2;
+    rot[3][3] = 1;
+    return rot;
+}
+glm::mat4 myScale(const glm::vec3& amount)
+{
+    glm::mat4 scaleMat = glm::mat4(amount.x, 0.0f, 0.0f, 0.0f, 0.0f, amount.y, 0.0f, 0.0f, 0.0f, 0.0f, amount.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); scaleMat = glm::transpose(scaleMat);
+    return scaleMat;
+}
+glm::mat4 myTranslate(const glm::vec3& amount)
+{
+    glm::mat4 transMat = glm::mat4(1.0f, 0.0f, 0.0f,amount.x, 0.0f, 1.0f, 0.0f, amount.y, 0.0f, 0.0f, 1.0f, amount.z, 0.0f, 0.0f, 0.0f, 1.0f); transMat = glm::transpose(transMat);
+    return transMat;
+}
+void teste()
+{
+    glm::vec4 inicialVec = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 transAmout = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    glm::mat4 transMat = myTranslate(transAmout);
+    glm::vec4 resultTrans = transMat * inicialVec;
+    std::cout << resultTrans.x << resultTrans.y << resultTrans.z << std::endl;
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+    std::cout << "glm\n";
+    printMatrix(trans);
+    
+    glm::mat4 teste = myRotate(glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    teste *= myScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    std::cout << "mine:\n";
+    printMatrix(teste);
+    
+}
+/*******************/
+int main()
+    {
     if (!glfwInit())
     {
         printf("Failed to init glfw\n");
@@ -48,19 +103,21 @@ int main()
 
     glViewport(0, 0, WIDTH, HEIGHT);
     Shader defaultShader("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShaderDefault.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShaderDefault.glsl");
-    Shader myShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShader.glsl");
+    Shader boxShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShader.glsl");
 
-    myShaders.use();
+    boxShaders.use();
 
-    myShaders.setInt("texture1", 0);
-    myShaders.setInt("texture2", 1);
+    boxShaders.setInt("texture1", 0);
+    boxShaders.setInt("texture2", 1);
+
 
     
-    house(VAO1, VBO1, EBO1);
+
+    CreateCircle(0.1, 50, -1, VAO1, VBO1, EBO1);
+    ////house(VAO1, VBO1, EBO1);
     retangle(VAO, VBO, EBO, texture1, texture2);
     while (!glfwWindowShouldClose(window))
     {
-
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -81,14 +138,21 @@ int main()
         
         glBindVertexArray(VAO);
         float timeValue = glfwGetTime();
-        myShaders.use();
-        myShaders.setFloat("timeValue", timeValue);
-        myShaders.setFloat("mixValue", 0.2f);
+        boxShaders.use();
+      //  boxShaders.
+        boxShaders.setFloat("timeValue", timeValue);
+        boxShaders.setFloat("mixValue", 0.2f);
+        glm::mat4 trans = myTranslate(glm::vec3(0.5f, -0.5f, 0.0f));
+        trans *= myRotate((float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+      /*  glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));*/
+        boxShaders.setMat4("transform", trans);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);// glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(VAO1);
         defaultShader.use();
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 150, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
