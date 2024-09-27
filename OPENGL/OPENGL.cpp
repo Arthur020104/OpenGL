@@ -35,6 +35,16 @@ glm::mat4 myRotate(const float &theta, const glm::vec3 &a)
     rot[3][3] = 1;
     return rot;
 }
+glm::mat3 myRotate2d(const float& theta)
+{
+    glm::mat3 rot = glm::mat3(glm::cos(theta), -glm::sinh(theta), 0.0f, glm::sin(theta), glm::cos(theta), 0.0f, 0.0f, 0.0f, 1.0f); rot = glm::transpose(rot);
+    return rot;
+}
+glm::mat3 myTranslate2d(const glm::vec2& amount)
+{
+    glm::mat3 transMat = glm::mat3(1.0f, 0.0f, amount.x, 0.0f, 1.0f, amount.y, 0.0f, 0.0f, 1.0f); transMat = glm::transpose(transMat);
+    return transMat;
+}
 glm::mat4 myScale(const glm::vec3& amount)
 {
     glm::mat4 scaleMat = glm::mat4(amount.x, 0.0f, 0.0f, 0.0f, 0.0f, amount.y, 0.0f, 0.0f, 0.0f, 0.0f, amount.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f); scaleMat = glm::transpose(scaleMat);
@@ -47,21 +57,13 @@ glm::mat4 myTranslate(const glm::vec3& amount)
 }
 void teste()
 {
-    glm::vec4 inicialVec = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec4 transAmout = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-    glm::mat4 transMat = myTranslate(transAmout);
-    glm::vec4 resultTrans = transMat * inicialVec;
-    std::cout << resultTrans.x << resultTrans.y << resultTrans.z << std::endl;
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-    std::cout << "glm\n";
-    printMatrix(trans);
+    glm::vec3 inicialVec = glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec3 result = myRotate2d(glm::radians(282.0f)) * myTranslate2d(glm::vec2(1.0f, 0.0f)) * inicialVec;
+   // std::cout << "X: " << result.x << " Y: " << result.y << "\n";
+
+    glm::vec3 result1 = myTranslate2d(glm::vec2(1.0f, 0.0f)) * myRotate2d(glm::radians(282.0f))  * inicialVec;
+    //std::cout << "X1: " << result1.x << " Y1: " << result1.y << "\n";
     
-    glm::mat4 teste = myRotate(glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    teste *= myScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    std::cout << "mine:\n";
-    printMatrix(teste);
     
 }
 /*******************/
@@ -111,7 +113,7 @@ int main()
     boxShaders.setInt("texture2", 1);
 
 
-    
+    float k = 0;
 
     CreateCircle(0.1, 50, -1, VAO1, VBO1, EBO1);
     ////house(VAO1, VBO1, EBO1);
@@ -119,7 +121,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
+        teste();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
@@ -149,7 +151,30 @@ int main()
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));*/
         boxShaders.setMat4("transform", trans);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);// glDrawArrays(GL_TRIANGLES, 0, 3);
+        trans = myTranslate(glm::vec3(-0.5f, 0.5f, 0.0f));
+        trans *= myScale(glm::vec3(1,1,1)*glm::sin((float)glfwGetTime()));
+        boxShaders.setMat4("transform", trans);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        k += glm::sin((float)glfwGetTime())/10;
+        std::cout << k / 200 * 12 << "\n";
+        for (int i = 0; i < 11; i++)
+        {
+            for (int j = 0; j < 11-i; j++)
+            {
+                trans = myRotate((float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+                trans *= myTranslate(glm::vec3(-0.9f+j/10.0f+ i / 20.f, -0.9f + i / 10.0f, 0.0f));
+                trans *= myScale(glm::vec3(0.1f, 0.1f, 0.1f));
+                if (k / 200 * 12 >= j && k / 200 * 12 < j + 1)
+                {
+                    trans *= myRotate((float)glfwGetTime()*50, glm::vec3(0.0f, 0.6f, 0.4f));
+                }
+                // trans *= myScale(glm::vec3(1, 1, 1) * glm::sin((float)glfwGetTime()));
+                boxShaders.setMat4("transform", trans);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            }
+            
+        }
         glBindVertexArray(VAO1);
         defaultShader.use();
         glDrawElements(GL_TRIANGLES, 150, GL_UNSIGNED_INT, 0);
