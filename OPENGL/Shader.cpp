@@ -123,6 +123,6 @@ void Shader::setFloat(const std::string& name, float value)const
 }
 void Shader::setMat4(const std::string& name, const glm::mat4& value)
 {
-	unsigned int transformLoc = glGetUniformLocation(ID, "transform");
+	unsigned int transformLoc = glGetUniformLocation(ID, name.c_str());
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(value));
 }

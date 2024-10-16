@@ -8,6 +8,7 @@
 #include <glm/glm/gtc/type_ptr.hpp>
 
 
+
 //Callback function for when window is resized
 //Funcao de callback para quando a janela eh resized(redimensionada)
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -66,9 +67,8 @@ void teste()
     
     
 }
-/*******************/
-int main()
-    {
+int init(GLFWwindow** window)
+{
     if (!glfwInit())
     {
         printf("Failed to init glfw\n");
@@ -81,16 +81,16 @@ int main()
 
     /*Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL features without backwards-compatible features we no longer need    Mac OS X you need to add glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); to your initialization code for it to work*/
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LeanOpengl", NULL, NULL);
+    *window = glfwCreateWindow(WIDTH, HEIGHT, "LeanOpengl", NULL, NULL);
     if (window == NULL)
     {
         printf("Failed to create GLFW window\n");
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(*window);
     //Avisando ao GLFW que queremos que essa funcao seja chamada toda vez que a janela eh redimensionada
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(*window, framebufferSizeCallback);
 
     /*******************Set GLFW********************/
     /*******************Set GLAD********************/
@@ -104,27 +104,50 @@ int main()
     /*******************Set GLAD********************/
 
     glViewport(0, 0, WIDTH, HEIGHT);
+    return 0;
+}
+/*******************/
+int main()
+{
+    GLFWwindow* window;
+    if (init(&window) == -1)
+    {
+        return -1;
+    }
     Shader defaultShader("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShaderDefault.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShaderDefault.glsl");
     Shader boxShaders("C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/vertexShader.glsl", "C:/Users/arthu/OneDrive/Desktop/OpenGl/OPENGLCOM/OPENGL/OPENGL/Shaders/fragmentShader.glsl");
-
+    box(VAO, VBO, EBO, texture1, texture2);
     boxShaders.use();
 
     boxShaders.setInt("texture1", 0);
     boxShaders.setInt("texture2", 1);
 
-
-    float k = 0;
-
-    CreateCircle(0.1, 50, -1, VAO1, VBO1, EBO1);
+    //glm::mat4 model = glm::mat4(1.0f);
+    
+    glEnable(GL_DEPTH_TEST);
+    glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+   // CreateCircle(0.1, 50, -1, VAO1, VBO1, EBO1);
     ////house(VAO1, VBO1, EBO1);
-    retangle(VAO, VBO, EBO, texture1, texture2);
+   
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
         teste();
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         
 
@@ -138,49 +161,47 @@ int main()
         
 
         
-        glBindVertexArray(VAO);
+        
+
         float timeValue = glfwGetTime();
+
         boxShaders.use();
-      //  boxShaders.
         boxShaders.setFloat("timeValue", timeValue);
         boxShaders.setFloat("mixValue", 0.2f);
-        glm::mat4 trans = myTranslate(glm::vec3(0.5f, -0.5f, 0.0f));
-        trans *= myRotate((float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-      /*  glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));*/
-        boxShaders.setMat4("transform", trans);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);// glDrawArrays(GL_TRIANGLES, 0, 3);
-        trans = myTranslate(glm::vec3(-0.5f, 0.5f, 0.0f));
-        trans *= myScale(glm::vec3(1,1,1)*glm::sin((float)glfwGetTime()));
-        boxShaders.setMat4("transform", trans);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        k += glm::sin((float)glfwGetTime())/10;
-        std::cout << k / 200 * 12 << "\n";
-        for (int i = 0; i < 11; i++)
+        
+
+        //glm::mat4 model = myTranslate(glm::vec3(0.0f, 0.0f, 0.0f));
+        //glm::mat4 model  = myRotate(glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        //boxShaders.setMat4("model", model);
+
+        glm::mat4 view = myTranslate(glm::vec3(0.0f, 0.0f, -20.0f));
+        //view *= myRotate(glm::radians(-10.0f * timeValue), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        unsigned int viewLoc = glGetUniformLocation(boxShaders.ID, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        boxShaders.setMat4("projection", projection);
+      
+
+        glBindVertexArray(VAO);
+        for (unsigned int i = 0; i < 10; i++)
         {
-            for (int j = 0; j < 11-i; j++)
-            {
-                trans = myRotate((float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-                trans *= myTranslate(glm::vec3(-0.9f+j/10.0f+ i / 20.f, -0.9f + i / 10.0f, 0.0f));
-                trans *= myScale(glm::vec3(0.1f, 0.1f, 0.1f));
-                if (k / 200 * 12 >= j && k / 200 * 12 < j + 1)
-                {
-                    trans *= myRotate((float)glfwGetTime()*50, glm::vec3(0.0f, 0.6f, 0.4f));
-                }
-                // trans *= myScale(glm::vec3(1, 1, 1) * glm::sin((float)glfwGetTime()));
-                boxShaders.setMat4("transform", trans);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            }
-            
-        }
-        glBindVertexArray(VAO1);
-        defaultShader.use();
-        glDrawElements(GL_TRIANGLES, 150, GL_UNSIGNED_INT, 0);
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i * (timeValue*2);
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            boxShaders.setMat4("model", model);
 
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        glBindVertexArray(0);
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
 
     glDeleteBuffers(1, &VAO1);
