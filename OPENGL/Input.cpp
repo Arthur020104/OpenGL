@@ -1,4 +1,6 @@
+#include "OPENGL.h"
 #include "Input.h"
+
 bool toggletWireFrameMode = false;
 bool wireFrame = false;
 
@@ -20,5 +22,15 @@ void processInput(GLFWwindow* window)
         wireFrame = !wireFrame;
         wireFrame ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+
+    }
     /***************WireFrame*************************/
+}
+bool isKeyPressed(GLFWwindow* window, const int& key)
+{
+    if (glfwGetKey(window,key) == GLFW_PRESS)
+        return true;
+    return false;
 }
