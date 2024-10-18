@@ -24,6 +24,10 @@ double LastTime = 0;
 
 float Speed = 8.0f;
 float DefaultSpeed = 8.0f;
+float VerticalSens = 50.0f;
+float HorizontalSens = 50.0f;
+
+int const AMOUNT_OF_SAMPLES_TO_COUNT_FPS = 30;
 
 glm::vec3 Camera = glm::vec3(0.0f, 0.0f, -2.0f);
 glm::vec3 LookPos = Camera + glm::vec3(0, 0, 100.0f);
@@ -46,7 +50,7 @@ void keyInput()
 {
         glm::vec3 forward = glm::normalize(LookPos - Camera);
         glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
-        std::cout << right.x << "--" << right.y << "--" << right.z << "\n";
+       // std::cout << right.x << "--" << right.y << "--" << right.z << "\n";
         if (isKeyPressed(Window, GLFW_KEY_S))
         {
             Camera +=  glm::fvec1((double)-Speed * DeltaTime) * forward;
@@ -84,50 +88,44 @@ void keyInput()
             Speed = DefaultSpeed;
         }
 
-
-        double xpos, ypos;
-        glfwGetCursorPos(Window, &xpos, &ypos);
-
-        if (LastXPos == -100000 || LastYPos == -100000)
-        {
-            LastXPos = xpos; LastYPos = ypos;
-            return;
-        }
-        
-        std::cout << "x: " << xpos - LastXPos << "-- y: " << glm::abs(ypos - LastYPos) << "\n";
-
-
-        //Horizontal Rotatation Camera
-     // Rotação horizontal em torno do eixo Y
-        glm::vec4 aux = glm::vec4(LookPos.x, LookPos.y, LookPos.z, 1.0f);
-        aux = myRotate(glm::radians(120.0f) * DeltaTime * (LastXPos - xpos), glm::vec3(0, 1.0f, 0)) * aux;
-        std::cout << "foward (horizontal):" << aux.x << "," << aux.y << "," << aux.z << "\n";
-        LookPos.x = aux.x;
-        LookPos.y = aux.y;
-        LookPos.z = aux.z;
-
-        // Rotação vertical em torno de um eixo fixo, como o eixo X (ou outro apropriado)
-        aux = glm::vec4(LookPos.x, LookPos.y, LookPos.z, 1.0f);
-        
-        aux = myRotate(glm::radians(120.0f) * DeltaTime * (LastYPos - ypos), glm::vec3(forward.z*-1, 0, forward.x)) * aux;  // Rota em torno do eixo X para vertical
-        std::cout << "foward (vertical):" << forward.x << "," << forward.y << "," << forward.z << "\n";
-        LookPos.x = aux.x;
-        LookPos.y = aux.y;
-        LookPos.z = aux.z;
-
-
-
-        LastXPos = xpos; LastYPos = ypos; 
-       /*/ glm::vec3 z = glm::cross(glm::vec3(LookPos.x, 0, 0), glm::vec3(0, LookPos.y, 0));
-        std::cout << "foward:" << z.x << "," << z.y << "," << z.z << "\n";
-        if (z.z >= -1 && z.z <= 1)
-        {
-            LookPos.z = z.z;
-
-        }*/
-
 }
+void cameraMovement()
+{
+    glm::vec3 forward = glm::normalize(LookPos - Camera);
+    double xpos, ypos;
+    glfwGetCursorPos(Window, &xpos, &ypos);
 
+    if (LastXPos == -100000 || LastYPos == -100000)
+    {
+        LastXPos = xpos; LastYPos = ypos;
+        return;
+    }
+
+
+
+    //Horizontal Rotatation Camera
+    // Rotação horizontal em torno do eixo Y
+    glm::vec4 aux = glm::vec4(LookPos.x, LookPos.y, LookPos.z, 1.0f);
+
+    aux = myRotate(glm::radians(HorizontalSens) * DeltaTime * (LastXPos - xpos), glm::vec3(0, 1.0f, 0)) * aux;
+
+    LookPos.x = aux.x;
+    LookPos.y = aux.y;
+    LookPos.z = aux.z;
+
+    // Rotação vertical em torno do foward
+    aux = glm::vec4(LookPos.x, LookPos.y, LookPos.z, 1.0f);
+
+    aux = myRotate(glm::radians(VerticalSens) * DeltaTime * (LastYPos - ypos), glm::vec3(forward.z * -1, 0, forward.x)) * aux;
+    
+    LookPos.x = aux.x;
+    LookPos.y = aux.y;
+    LookPos.z = aux.z;
+
+
+
+    LastXPos = xpos; LastYPos = ypos;
+}
 int init(GLFWwindow** window)
 {
     if (!glfwInit())
@@ -205,7 +203,9 @@ int main()
    // CreateCircle(0.1, 50, -1, VAO1, VBO1, EBO1);
     ////house(VAO1, VBO1, EBO1);
 
-
+    int FpsSampleCounter = 0;
+    double DeltatimeMean = 0;
+    // Mean for every 2 frames with weights 0.8 and 0.2, with the newer frame being weighted higher.
     while (!glfwWindowShouldClose(Window))
     {
         processInput(Window);
@@ -232,10 +232,16 @@ int main()
         boxShaders.setFloat("timeValue",(float) timeValue);
         boxShaders.setFloat("mixValue", 0.2f);
 
+        DeltatimeMean = (DeltatimeMean*0.2 + DeltaTime*0.8)/2;
+        FpsSampleCounter++;
+        if (FpsSampleCounter >= AMOUNT_OF_SAMPLES_TO_COUNT_FPS)
+        {
+            FpsSampleCounter = 0;
+            std::cout << "Fps: " << int(1 / DeltaTime) << "\n";
+        }
         
-
         keyInput();
-
+        cameraMovement();
           
         View = glm::lookAt(Camera, LookPos, glm::vec3(0, 1, 0));// glm::translate(View, glm::vec3(0.0f, 0.0f, -2.0f));
 
@@ -253,9 +259,11 @@ int main()
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i * (timeValue*2);
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            if (i % 3 == 0)
+            {
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            }
             boxShaders.setMat4("model", model);
-
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
